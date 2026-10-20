@@ -113,3 +113,28 @@ def test_allowlist_is_nonempty_and_tuples_of_str():
     assert all(isinstance(s, str) and s for s in PROXY_ALLOWED_HOST_SUFFIXES)
     # No leading dots — matching is host == s or host.endswith("." + s).
     assert all(not s.startswith(".") for s in PROXY_ALLOWED_HOST_SUFFIXES)
+
+
+class TestDetailRobustness:
+    """``/detail/{id}`` is normally fed IDs that came from search/home, but a
+    stale bookmark or a fabricated ID makes upstream answer ``"data": null``.
+
+    A dict default (``.get("data", {})``) only applies when the key is ABSENT,
+    so a null payload used to reach ``data.get(...)`` and surface as an
+    unhandled ``AttributeError`` -> HTTP 500. Clients should get a well-formed
+    (if empty) detail object instead.
+    """
+
+    def test_null_data_does_not_become_a_500(self, client, monkeypatch):
+        import api
+
+        monkeypatch.setattr(api.engine, "api_request", lambda *a, **k: {"data": None})
+        resp = client.get("/detail/0000000000000000000")
+        assert resp.status_code == 200
+        assert resp.json()["title"] is None
+
+    def test_absent_data_key_also_survives(self, client, monkeypatch):
+        import api
+
+        monkeypatch.setattr(api.engine, "api_request", lambda *a, **k: {})
+        assert client.get("/detail/0000000000000000000").status_code == 200

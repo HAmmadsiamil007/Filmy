@@ -397,7 +397,10 @@ class FilmyEngine:
 
     def get_details(self, subject_id: str) -> Dict[str, Any]:
         url = f"/wefeed-mobile-bff/subject-api/get?subjectId={subject_id}"
-        data = self.api_request("GET", url).get("data", {})
+        # `or {}` not `get("data", {})`: upstream returns `"data": null` for an
+        # unknown subjectId, and a dict default only applies when the key is
+        # absent — so the naive form crashed with AttributeError -> HTTP 500.
+        data = self.api_request("GET", url).get("data") or {}
         detail_url_str = data.get("detailUrl", "")
         detail_path = detail_url_str.split("/")[-1] if "/" in detail_url_str else detail_url_str
         genre = data.get("genre")
