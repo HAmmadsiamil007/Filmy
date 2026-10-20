@@ -7,18 +7,20 @@ import re
 import secrets
 import sys
 import time
+import random
 from typing import Any, Dict, List, Optional
 from urllib.parse import urlsplit
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, StreamingResponse, Response
+
+import httpx
 
 try:
     from curl_cffi import requests as cr
 except ImportError:
     cr = None
-    import httpx
 
 if sys.stdout and hasattr(sys.stdout, "reconfigure"):
     try:
@@ -62,6 +64,124 @@ WEB_DOMAINS = [
     "https://netnaija.film",
     "https://movieboxhd.net",
 ]
+
+# ---------------------------------------------------------------------------
+# Stream proxy allowlist
+# The upstream CDN is Referer-locked, so browsers cannot fetch the MP4/DASH
+# URLs directly (a <video> element cannot send a Referer header). We relay the
+# bytes through this API and forward the required headers. To keep /proxy from
+# becoming an open SSRF relay, only these host suffixes are ever proxied.
+# ---------------------------------------------------------------------------
+PROXY_ALLOWED_HOST_SUFFIXES = (
+    "hakunaymatata.com",
+    "aoneroom.com",
+    "moviebox.ph",
+    "inmoviebox.com",
+)
+
+def is_proxyable(url: str) -> bool:
+    try:
+        host = (urlsplit(url).hostname or "").lower()
+    except Exception:
+        return False
+    if not host:
+        return False
+    return any(host == s or host.endswith("." + s) for s in PROXY_ALLOWED_HOST_SUFFIXES)
+
+# ---------------------------------------------------------------------------
+# Simple in-process TTL cache + 429-aware retry.
+# Metadata (search/detail/episodes) is stable -> long TTL.
+# Stream URLs are signed and expire (`&t=<epoch>`) -> short TTL.
+# ---------------------------------------------------------------------------
+from functools import lru_cache
+from functools import lru_cache
+import threading
+
+_CACHE: Dict[str, Any] = {}
+_CACHE_LOCK = threading.Lock()
+
+def cache_get(key: str) -> Any:
+    with _CACHE_LOCK:
+        hit = _CACHE.get(key)
+        if not hit:
+            return None
+        expires_at, value = hit
+        if time.time() > expires_at:
+            _CACHE.pop(key, None)
+            return None
+        return value
+
+def cache_set(key: str, value: Any, ttl: float) -> None:
+    with _CACHE_LOCK:
+        if len(_CACHE) > 2048:
+            now = time.time()
+            _CACHE.clear()
+        _CACHE[key] = (time.time() + ttl, value)
+
+CACHE_TTL_METADATA = 900.0   # 15 min: search, detail, episodes, catalog
+CACHE_TTL_STREAM = 120.0     # 2 min: signed stream URLs (they expire)
+CACHE_TTL_SUGGEST = 600.0    # 10 min
+
+# ---------------------------------------------------------------------------
+# Subject-type labels.
+# The original code did `"Movie" if subjectType == 1 else "Series"`, which
+# mislabels types 6/7/8 as plain "Series". These map the real catalog buckets
+# so clients can build correct tabs (movies / series / anime / short-drama).
+# ---------------------------------------------------------------------------
+SUBJECT_TYPE_LABELS = {
+    1: "Movie",
+    2: "Series",
+    3: "Anime",
+    6: "Anime",
+    7: "ShortDrama",
+    8: "Promo",
+}
+
+def classify_subject_type(raw: Any) -> str:
+    try:
+        n = int(raw)
+    except (TypeError, ValueError):
+        return "Unknown"
+    return SUBJECT_TYPE_LABELS.get(n, "Series" if n else "Unknown")
+
+# ---------------------------------------------------------------------------
+# Adult-content filter.
+# The upstream catalog is NOT age-gated and adult titles bleed into generic
+# search results. Clients can pass `include_adult=false` (the default) to have
+# them stripped server-side, so the filtering lives in one place for all
+# four clients rather than being duplicated per platform.
+# ---------------------------------------------------------------------------
+ADULT_GENRE_TOKENS = ("adult", "erotic", "porn", "xxx", "hentai", "18+")
+
+def is_adult(genre: Any) -> bool:
+    if not genre or not isinstance(genre, str):
+        return False
+    g = genre.lower()
+    return any(tok in g for tok in ADULT_GENRE_TOKENS)
+
+def strip_adult(items: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    return [it for it in items if not it.get("is_adult")]
+
+
+MAX_FETCH_RETRIES = 4
+
+def fetch_with_backoff(do_request, retries: int = MAX_FETCH_RETRIES):
+    """Run a callable, retrying on 429 with exponential backoff + jitter."""
+    last_exc = None
+    for attempt in range(retries):
+        try:
+            return do_request()
+        except HTTPException as exc:
+            if exc.status_code != 429 or attempt == retries - 1:
+                raise
+            last_exc = exc
+        except Exception as exc:
+            last_exc = exc
+            if attempt == retries - 1:
+                raise
+        time.sleep(min(2 ** attempt * 0.5, 4.0) + random.uniform(0, 0.3))
+    raise last_exc
+
 
 def _b64decode(s: str) -> bytes:
     s = s.replace("-", "+").replace("_", "/")
@@ -259,14 +379,16 @@ class MovieBoxEngine:
         results = []
         for item in raw_items:
             sub = item.get("subject", item)
+            genre = sub.get("genre")
             results.append({
                 "subject_id": str(sub.get("subjectId")),
                 "title": sub.get("title"),
-                "type": "Movie" if sub.get("subjectType") == 1 else "Series",
+                "type": classify_subject_type(sub.get("subjectType")),
                 "subject_type": sub.get("subjectType"),
                 "release_date": sub.get("releaseDate"),
                 "imdb_rating": sub.get("imdbRatingValue"),
-                "genre": sub.get("genre"),
+                "genre": genre,
+                "is_adult": is_adult(genre),
                 "cover": sub.get("cover", {}).get("url") if isinstance(sub.get("cover"), dict) else None,
                 "detail_path": sub.get("detailPath"),
                 "language": sub.get("language")
@@ -278,16 +400,18 @@ class MovieBoxEngine:
         data = self.api_request("GET", url).get("data", {})
         detail_url_str = data.get("detailUrl", "")
         detail_path = detail_url_str.split("/")[-1] if "/" in detail_url_str else detail_url_str
+        genre = data.get("genre")
         return {
             "subject_id": str(data.get("subjectId")),
             "title": data.get("title"),
             "subject_type": data.get("subjectType"),
-            "type": "Movie" if data.get("subjectType") == 1 else "Series",
+            "type": classify_subject_type(data.get("subjectType")),
             "description": data.get("description"),
             "release_date": data.get("releaseDate"),
             "duration": data.get("duration"),
             "imdb_rating": data.get("imdbRatingValue"),
-            "genre": data.get("genre"),
+            "genre": genre,
+            "is_adult": is_adult(genre),
             "country": data.get("countryName"),
             "language": data.get("language"),
             "cover": data.get("cover", {}).get("url") if isinstance(data.get("cover"), dict) else None,
@@ -1035,8 +1159,28 @@ async def dashboard():
     return HTMLResponse(content=html_content)
 
 @app.get("/search")
-def search(q: str = Query(..., min_length=1), page: int = 1, per_page: int = 20):
-    return {"query": q, "page": page, "results": engine.search(q, page=page, per_page=per_page)}
+def search(
+    q: str = Query(..., min_length=1),
+    page: int = 1,
+    per_page: int = 20,
+    include_adult: bool = False,
+):
+    cache_key = f"search:{q}:{page}:{per_page}:{include_adult}"
+    results = cache_get(cache_key)
+    if results is None:
+        results = fetch_with_backoff(
+            lambda: engine.search(q, page=page, per_page=per_page)
+        )
+        cache_set(cache_key, results, CACHE_TTL_METADATA)
+    if not include_adult:
+        results = strip_adult(results)
+    return {
+        "query": q,
+        "page": page,
+        "include_adult": include_adult,
+        "count": len(results),
+        "results": results,
+    }
 
 @app.get("/search/suggest")
 def search_suggest(q: str = Query(..., min_length=1)):
@@ -1087,53 +1231,181 @@ def get_captions(subject_id: str, se: int = 0, ep: int = 0, stream_id: Optional[
         "captions": subs
     }
 
-@app.get("/movies")
-def get_movies(page: int = 1, per_page: int = 24, sort: str = "RECOMMEND"):
-    url = f"{API_BASE}/subject/filter"
-    payload = {"tabId": 2, "filter": {"sort": sort, "genre": "ALL", "country": "ALL", "year": "ALL", "language": "ALL"}, "page": page, "perPage": per_page}
-    resp = engine.session.post(url, headers={"User-Agent": WEB_USER_AGENT, "Referer": "https://moviebox.ph/"}, json=payload, timeout=20)
-    data = resp.json().get("data", {})
-    raw = data.get("items") or data.get("subjects") or []
+# ---------------------------------------------------------------------------
+# Stream proxy
+# MP4/DASH URLs are Referer-locked to the source domain, so a browser <video>
+# tag (which cannot set Referer) gets 403. This endpoint relays the bytes and
+# forwards the required headers, adding Range support so seeking works.
+#
+#   /proxy/stream?url=<encoded stream url>&referer=<domain>
+#
+# It also emits the CORS + Accept-Ranges headers browsers need, so the SAME
+# URL works from web, desktop (Tauri/WebView) and Android (ExoPlayer) clients.
+# ---------------------------------------------------------------------------
+PROXY_CHUNK = 256 * 1024
+
+@app.get("/proxy/stream")
+def proxy_stream(
+    request: Request,
+    url: str = Query(..., min_length=1),
+    referer: Optional[str] = None,
+):
+    if not url.startswith(("http://", "https://")):
+        raise HTTPException(status_code=400, detail="Only http/https URLs can be proxied")
+    if not is_proxyable(url):
+        raise HTTPException(status_code=403, detail="Host not in proxy allowlist")
+
+    # Forward the client's Range header so <video> seeking / ExoPlayer works.
+    range_header = request.headers.get("range")
+
+    parsed = urlsplit(url)
+    domain = f"{parsed.scheme}://{parsed.netloc}"
+
+    upstream_headers = {
+        "User-Agent": WEB_USER_AGENT,
+        "Referer": referer or f"{domain}/",
+        "Origin": domain,
+        "Accept": "*/*",
+        "Accept-Encoding": "identity",
+    }
+    if range_header:
+        upstream_headers["Range"] = range_header
+
+    # NOTE: the video CDN does not pin TLS fingerprints (verified: a plain
+    # .NET client fetches the bytes fine as long as Referer/UA are present),
+    # so httpx is sufficient here and, unlike curl_cffi's generator-based
+    # .stream(), is a real async context manager we can stream through.
+    try:
+        upstream_cm = httpx.stream(
+            "GET", url, headers=upstream_headers, timeout=30, follow_redirects=True
+        )
+        resp = upstream_cm.__enter__()
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"Upstream fetch failed: {exc}")
+
+    if resp.status_code >= 400:
+        try:
+            upstream_cm.__exit__(None, None, None)
+        except Exception:
+            pass
+        raise HTTPException(status_code=502, detail=f"Upstream returned HTTP {resp.status_code}")
+
+    status_code = resp.status_code
+    content_type = resp.headers.get("content-type", "application/octet-stream")
+    content_length = resp.headers.get("content-length")
+    content_range = resp.headers.get("content-range")
+    accept_ranges = resp.headers.get("accept-ranges", "bytes")
+
+    def iter_upstream():
+        try:
+            for chunk in resp.iter_bytes(PROXY_CHUNK):
+                yield chunk
+        finally:
+            try:
+                upstream_cm.__exit__(None, None, None)
+            except Exception:
+                pass
+
+    out_headers = {
+        "Accept-Ranges": accept_ranges,
+        "Content-Type": content_type,
+        # Explicit CORS so any origin (web app, desktop shell) can play it.
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "Range, Origin, Accept",
+        "Access-Control-Expose-Headers": "Content-Length, Content-Range, Accept-Ranges",
+        "Cache-Control": "public, max-age=3600",
+    }
+    if content_length:
+        out_headers["Content-Length"] = content_length
+    if content_range:
+        out_headers["Content-Range"] = content_range
+
+    return StreamingResponse(
+        iter_upstream(),
+        status_code=status_code,
+        headers=out_headers,
+    )
+
+@app.get("/proxy")
+def proxy_info():
     return {
-        "page": page,
-        "per_page": per_page,
-        "total": data.get("pager", {}).get("totalCount") or len(raw),
-        "items": [
-            {
-                "title": s.get("title"),
-                "subject_id": str(s.get("subjectId")),
-                "detail_path": s.get("detailPath"),
-                "cover": s.get("cover", {}).get("url") if isinstance(s.get("cover"), dict) else None,
-                "rating": s.get("imdbRatingValue"),
-                "year": s.get("releaseDate", "")[:4] if s.get("releaseDate") else None
-            }
-            for s in raw
-        ]
+        "usage": "/proxy/stream?url=<encoded_url>&referer=<domain>",
+        "allowed_host_suffixes": list(PROXY_ALLOWED_HOST_SUFFIXES),
+        "note": "Relays Referer-locked MP4/DASH streams with Range support for seeking.",
     }
 
-@app.get("/tv-series")
-def get_tv_series(page: int = 1, per_page: int = 24, sort: str = "RECOMMEND"):
-    url = f"{API_BASE}/subject/filter"
-    payload = {"tabId": 5, "filter": {"sort": sort, "genre": "ALL", "country": "ALL", "year": "ALL", "language": "ALL"}, "page": page, "perPage": per_page}
-    resp = engine.session.post(url, headers={"User-Agent": WEB_USER_AGENT, "Referer": "https://moviebox.ph/"}, json=payload, timeout=20)
-    data = resp.json().get("data", {})
-    raw = data.get("items") or data.get("subjects") or []
+@app.get("/health")
+def health():
+    """Liveness check for all four clients (web/desktop/TV/APK) on startup."""
     return {
+        "status": "ok",
+        "version": app.version,
+        "proxy_enabled": True,
+        "proxy_allowed_hosts": list(PROXY_ALLOWED_HOST_SUFFIXES),
+        "adult_filter_default": "enabled (pass include_adult=true to override)",
+    }
+
+def _catalog(tab_id: int, page: int, per_page: int, sort: str, include_adult: bool) -> Dict[str, Any]:
+    cache_key = f"catalog:{tab_id}:{page}:{per_page}:{sort}:{include_adult}"
+    cached = cache_get(cache_key)
+    if cached is not None:
+        return cached
+
+    def _fetch():
+        url = f"{API_BASE}/subject/filter"
+        payload = {
+            "tabId": tab_id,
+            "filter": {"sort": sort, "genre": "ALL", "country": "ALL", "year": "ALL", "language": "ALL"},
+            "page": page,
+            "perPage": per_page,
+        }
+        resp = engine.session.post(
+            url,
+            headers={"User-Agent": WEB_USER_AGENT, "Referer": "https://moviebox.ph/"},
+            json=payload,
+            timeout=20,
+        )
+        if resp.status_code == 429:
+            raise HTTPException(status_code=429, detail="Upstream rate limited")
+        if resp.status_code != 200:
+            raise HTTPException(status_code=502, detail=f"API returned HTTP {resp.status_code}")
+        return resp.json().get("data", {})
+
+    data = fetch_with_backoff(_fetch)
+    raw = data.get("items") or data.get("subjects") or []
+
+    items = []
+    for s in raw:
+        genre = s.get("genre")
+        item = {
+            "title": s.get("title"),
+            "subject_id": str(s.get("subjectId")),
+            "detail_path": s.get("detailPath"),
+            "cover": s.get("cover", {}).get("url") if isinstance(s.get("cover"), dict) else None,
+            "rating": s.get("imdbRatingValue"),
+            "genre": genre,
+            "is_adult": is_adult(genre),
+            "year": s.get("releaseDate", "")[:4] if s.get("releaseDate") else None,
+        }
+        if include_adult or not item["is_adult"]:
+            items.append(item)
+
+    result = {
         "page": page,
         "per_page": per_page,
-        "total": data.get("pager", {}).get("totalCount") or len(raw),
-        "items": [
-            {
-                "title": s.get("title"),
-                "subject_id": str(s.get("subjectId")),
-                "detail_path": s.get("detailPath"),
-                "cover": s.get("cover", {}).get("url") if isinstance(s.get("cover"), dict) else None,
-                "rating": s.get("imdbRatingValue"),
-                "year": s.get("releaseDate", "")[:4] if s.get("releaseDate") else None
-            }
-            for s in raw
-        ]
+        "total": data.get("pager", {}).get("totalCount") or len(items),
+        "items": items,
     }
+    cache_set(cache_key, result, CACHE_TTL_METADATA)
+    return result
+
+@app.get("/movies")
+def get_movies(page: int = 1, per_page: int = 24, sort: str = "RECOMMEND", include_adult: bool = False):
+    return _catalog(2, page, per_page, sort, include_adult)
+
+@app.get("/tv-series")
+def get_tv_series(page: int = 1, per_page: int = 24, sort: str = "RECOMMEND", include_adult: bool = False):
+    return _catalog(5, page, per_page, sort, include_adult)
 
 @app.get("/home")
 def get_home():
