@@ -11,7 +11,7 @@ them - root files summarize and link into the vault.
 | `architecture.md` | One-page system map: mermaid diagram, 2 request paths (metadata/cached vs playback/short-lived), api.py region table, client layout, trust boundary diagram. | Links to ADR-001..005 rather than restating them. |
 | `design.md` | Design system: real tokens from styles.css + Color.kt, type scale, spacing, surfaces, component specs, motion, responsive, a11y checklist, platform-parity table. | Documents KNOWN DIVERGENCES (error red web #FF8A8A vs Android #EF4444). |
 | `CONTRIBUTING.md` | REWRITTEN. Old one had mojibake emoji and referenced python verify.py (deleted in commit 12f70ae). | Setup, verify-before-done matrix, PR/commit style, standards. |
-| `CHANGELOG.md` | Keep a Changelog format. 2.5.0 = all 2026-10-20 work; 2.0.0 = upstream. | Pre-2.0.0 history stays in git log. |
+| `CHANGELOG.md` | Keep a Changelog format. **Unreleased** = the Filmy rename (identifiers + settings-key migrations); 2.5.0 = backend/web work; 2.0.0 = upstream. | Pre-2.0.0 history stays in git log. |
 | `SECURITY.md` | Threat model: the SSRF boundary, in/out-of-scope reporting, deliberately-absent controls table, client-side notes. | Do NOT open public issues for vulns. |
 | `.editorconfig` | indent/charset/EOL per language. md keeps trailing whitespace (hard line breaks). | |
 | `.env.example` | Documents that the backend reads NO env vars (by design, ADR-005). Only $PORT, consumed by the SHELL. | Prevents hunting for config that does not exist. |

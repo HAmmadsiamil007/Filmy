@@ -1,6 +1,6 @@
 # Core
 
-MovieBox REST API + clients. Scrapes/proxies the MovieBox (moviebox.ph) catalog; does not host content.
+Filmy REST API + clients. Scrapes/proxies the MovieBox (moviebox.ph) catalog; does not host content.
 
 ## Source map
 - api.py - the entire backend. Single-file FastAPI app. Routes live at the file bottom; everything above is the `engine` scraper class + helpers.
@@ -31,4 +31,5 @@ MovieBox REST API + clients. Scrapes/proxies the MovieBox (moviebox.ph) catalog;
 - Android APK (written, UNCOMPILED) + bugs caught by review: `mem:architecture/android_build`
 - Backend unit suite: 129 tests, pytest: `mem:backend/tests`
 - Repo-level project files (rules/AGENTS/architecture/design/CI/link-checker): `mem:project/root_files`
+- Project renamed to Filmy - upstream-vs-ours naming rule + migrations: `mem:project/identity`
 - gitignore traps + commit practice: `mem:project/git_hygiene`

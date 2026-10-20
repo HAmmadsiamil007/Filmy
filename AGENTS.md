@@ -8,7 +8,7 @@
 
 ## What this is
 
-A scraper proxy for MovieBox plus three thin clients.
+Filmy - a scraper proxy for the MovieBox catalog, plus three thin clients.
 
 - **Backend** `api.py` — single-file FastAPI app, 13 routes, a stream proxy, a TTL cache.
 - **Clients** `web/` (React + `hls.js`; Tauri wraps it) and `android/` (Kotlin + Compose + Media3; TV will extend it).

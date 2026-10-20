@@ -8,7 +8,46 @@ Pre-2.0.0 history is in `git log` (`4289bc6 feat: v2.0.0 rewrite…`).
 
 ---
 
-## [2.5.0] — 2026-10-20
+## [Unreleased]
+
+### Changed - project identity (rename)
+
+- **Renamed the project to `Filmy`.** Only *our* brand strings changed; every
+  upstream literal the backend depends on was left byte-for-byte identical
+  (`apig.inmoviebox.com`, `moviebox.ph`, `inmoviebox.com`, `movieboxonline.net`,
+  `movieboxhd.net`, `movie-box.co`, `aoneroom.com`, `x-source: moviebox`, the
+  `PROXY_ALLOWED_HOST_SUFFIXES` allowlist and `WEB_DOMAINS`).
+- **Touched identifiers** - changing any of these changes on-disk state, which
+  is why each has a migration:
+
+  | Surface | Before | After |
+  | --- | --- | --- |
+  | npm package | `moviebox-web` | `filmy-web` |
+  | Tauri | `productName` `MovieBox`, `identifier` `com.moviebox.desktop` | `Filmy`, `com.filmy.desktop` |
+  | Rust crate / lib | `moviebox-desktop`, `moviebox_desktop_lib` | `filmy-desktop`, `filmy_desktop_lib` |
+  | Android | `namespace`/`applicationId` `com.moviebox.app` | `com.filmy.app` |
+  | Android Gradle root | `rootProject.name` `MovieBox` | `Filmy` |
+  | Android prefs file | `moviebox` | `filmy` |
+  | Settings key (both clients) | `moviebox.apiBase` | `filmy.apiBase` |
+  | Backend symbols | `MovieBoxEngine` | `FilmyEngine` |
+  | Android symbols | `MovieBoxApp`, `MovieBoxTheme`, `Theme.MovieBox` | `FilmyApp`, `FilmyTheme`, `Theme.Filmy` |
+
+- **Saved settings survive the upgrade.** `config.ts` reads the pre-rename
+  `moviebox.apiBase` as a fallback and adopts it; `Config.kt` copies the old
+  `moviebox` SharedPreferences file across on first `init()`. Without this the
+  rename would silently revert every existing user's configured backend URL.
+- **Historical gitignore evidence kept the old path deliberately.** The
+  `rules.md` / `.gitignore` / `Git Workflow.md` / `Status.md` / `git_hygiene.md`
+  examples showing `moviebox/` matching `.../com/moviebox/app/` still quote the
+  pre-rename path - rewriting them would make the example untrue.
+- Upstream-facing prose still says "MovieBox" where it means the *catalog being
+  scraped* (`AGENTS.md`, `Overview.md`, ADR-002, ADR-004, `core.md`).
+- **Android remains uncompiled** - the package move was verified statically
+  (14/14 package-vs-path match, all `com.filmy.*` imports resolve), not by Gradle.
+
+---
+
+## [2.5.0] - 2026-10-20
 
 ### Added — backend
 

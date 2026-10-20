@@ -19,7 +19,7 @@ SCAFFOLDED 2026-10-20. Files written, toolchain intentionally NOT installed.
 - tauri build WILL FAIL on missing icons. Generate with npm run tauri:icons from a source PNG at src-tauri/app-icon.png.
 
 ## Config facts
-- identifier com.moviebox.desktop, productName MovieBox.
+- identifier com.filmy.desktop, productName Filmy.
 - frontendDist ../dist, devUrl http://127.0.0.1:5173, beforeBuildCommand npm run build.
 - CSP: connect-src allows self plus http/https/ws/wss so a remote API base works; media-src allows http/https/blob for the proxy.
 

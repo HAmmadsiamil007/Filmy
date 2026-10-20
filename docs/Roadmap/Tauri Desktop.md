@@ -36,7 +36,7 @@ The web app is already built and verified ([[Project/Status]]), so the desktop t
 ```
 web/src-tauri/
 ├── Cargo.toml               # tauri 2, tauri-build 2, release profile stripped+lto
-├── tauri.conf.json          # identifier com.moviebox.desktop, frontendDist ../dist
+├── tauri.conf.json          # identifier com.filmy.desktop, frontendDist ../dist
 ├── build.rs
 ├── capabilities/default.json
 ├── .gitignore               # /target, /gen/schemas

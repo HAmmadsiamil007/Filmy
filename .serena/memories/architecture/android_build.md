@@ -30,7 +30,7 @@ Bugs already caught by review (each was real):
   in a DisposableEffect; manifest pins portrait otherwise.
 
 # Files
-- data/Config.kt - mirrors web/src/config.ts. SharedPreferences key moviebox.apiBase.
+- data/Config.kt - mirrors web/src/config.ts. SharedPreferences key filmy.apiBase.
   DIFFERENCE vs web: empty base is meaningless on Android (no origin) so it falls back to
   BuildConfig.DEFAULT_API_BASE (-PdefaultApiBase=...), then errors with an actionable message.
 - data/Models.kt - @Serializable with EXPLICIT @SerialName on every snake_case field (no naming

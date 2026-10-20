@@ -1,7 +1,7 @@
-# 🎬 MovieBox — Map of Content
+# 🎬 Filmy — Map of Content
 
 > [!info] Start here
-> This vault is the single source of truth for the MovieBox project. Open the **graph view** to see how everything connects.
+> This vault is the single source of truth for the Filmy project. Open the **graph view** to see how everything connects.
 
 ---
 

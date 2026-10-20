@@ -116,7 +116,7 @@ Read it top-down — everything above the routes is the engine.
 
 ```
 web/                          ← codebase #1
-├── src/config.ts             runtime API base URL (localStorage `moviebox.apiBase`)
+├── src/config.ts             runtime API base URL (localStorage `filmy.apiBase`)
 ├── src/api.ts                typed calls, all through apiUrl()
 ├── src/App.tsx               routing + shell
 ├── src/Settings.tsx          base-URL modal, probes /health before saving
@@ -125,7 +125,7 @@ web/                          ← codebase #1
 └── src-tauri/                ← desktop target: thin Tauri v2 shell on the same app
 
 android/                      ← codebase #2
-├── app/src/main/java/com/moviebox/app/
+├── app/src/main/java/com/filmy/app/
 │   ├── data/    Config · Models · Api        (mirrors api.ts)
 │   ├── player/  QualityLogic                 (pure, JVM-testable)
 │   └── ui/      nav · theme · screens
@@ -156,7 +156,7 @@ and `mem:architecture/android_build`.
 
 | Setting | Where | Scope |
 |---------|-------|-------|
-| API base URL | `localStorage.moviebox.apiBase` / `SharedPreferences` | per client instance, user-editable in Settings |
+| API base URL | `localStorage.filmy.apiBase` / `SharedPreferences` | per client instance, user-editable in Settings |
 | Adult filter | query param `include_adult` | per request, default `false` |
 | Port | `$PORT` (shell, used by Procfile/Railway) | deployment only |
 

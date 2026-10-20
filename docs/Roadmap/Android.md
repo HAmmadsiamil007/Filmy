@@ -79,8 +79,8 @@ android/
 │   └── src/
 │       ├── main/
 │       │   ├── AndroidManifest.xml
-│       │   ├── java/com/moviebox/app/
-│       │   │   ├── MovieBoxApp.kt, MainActivity.kt
+│       │   ├── java/com/filmy/app/
+│       │   │   ├── FilmyApp.kt, MainActivity.kt
 │       │   │   ├── data/     Config.kt, Models.kt, Api.kt   # mirrors api.ts
 │       │   │   ├── player/   QualityLogic.kt                # pure, tested
 │       │   │   └── ui/       nav/Nav.kt, theme/, screens/{Home,Detail,Player,Settings}
@@ -117,7 +117,7 @@ This is **real UX work**, not a stylesheet — budget for it.
 
 ## Open dependencies
 
-- [x] **Backend hosting decision** → resolved as **remote / self-hosted** ([[Decisions/ADR-005 Remote self-hosted backend]]). APK is a thin client; base URL lives in `SharedPreferences` (`moviebox.apiBase`, same key as web) with a Settings screen whose **Test** probe reverts on failure.
+- [x] **Backend hosting decision** → resolved as **remote / self-hosted** ([[Decisions/ADR-005 Remote self-hosted backend]]). APK is a thin client; base URL lives in `SharedPreferences` (`filmy.apiBase`, same key as web) with a Settings screen whose **Test** probe reverts on failure.
 - [x] `subject_type` labels correct server-side ([[Reference/Subject Types]]) — `Models.kt` exposes the **classified** `type`, with `isMovie` as the branch helper. Never branch on raw `subject_type`.
 - [ ] **Android SDK + Gradle** installed — gates the first real build.
 - [ ] First `assembleDebug` green (expected to need fixes).

@@ -1,4 +1,4 @@
-# MovieBox REST API
+# Filmy REST API
 
 [![CI](https://github.com/walterwhite-69/Moviebox-API/actions/workflows/ci.yml/badge.svg)](https://github.com/walterwhite-69/Moviebox-API/actions/workflows/ci.yml)
 [![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com/)

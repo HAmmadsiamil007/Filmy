@@ -1,4 +1,4 @@
-# MovieBox Android
+# Filmy Android
 
 Native Kotlin client — **codebase #2** of the 2-codebase strategy (ADR-003).
 Covers the phone APK; the Android TV variant reuses these sources with
@@ -62,8 +62,8 @@ Point the APK at a LAN backend at build time (optional — Settings overrides it
 ## Layout
 
 ```
-app/src/main/java/com/moviebox/app/
-├── MovieBoxApp.kt          # Application; inits Config once
+app/src/main/java/com/filmy/app/
+├── FilmyApp.kt          # Application; inits Config once
 ├── MainActivity.kt         # single-activity host
 ├── data/
 │   ├── Config.kt           # runtime API base  (mirrors web/src/config.ts)
@@ -96,5 +96,5 @@ app/src/test/.../QualityLogicTest.kt   # 17 tests, no Android deps
 ## Backend hosting
 
 Remote / self-hosted (ADR-005): thin client, no bundled Python. Base URL lives in
-`SharedPreferences` (`moviebox.apiBase` — same key as web) with a Settings screen
+`SharedPreferences` (`filmy.apiBase` — same key as web) with a Settings screen
 whose **Test** probe reverts on failure so a bad host is never persisted.

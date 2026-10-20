@@ -13,7 +13,7 @@ depends_on: [ADR-005]
 
 | Export | Behaviour |
 | --- | --- |
-| `getApiBase()` | Reads `localStorage["moviebox.apiBase"]`, cached in a module var. **Empty string = same origin.** |
+| `getApiBase()` | Reads `localStorage["filmy.apiBase"]`, cached in a module var. **Empty string = same origin.** |
 | `setApiBase(raw)` | Normalizes (strips trailing `/`), persists. Pass `""` to reset to same-origin. |
 | `apiUrl(path)` | `path` when base empty, else `base + path`. **The only place the base is joined.** |
 | `checkHealth(ms)` | `AbortController` probe of `/health`. Returns a result object — **never throws**. |

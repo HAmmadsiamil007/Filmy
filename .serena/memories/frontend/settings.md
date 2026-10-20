@@ -1,7 +1,7 @@
 # Frontend Settings and Runtime Config
 
 ## config.ts
-- STORAGE_KEY = moviebox.apiBase. normalize() strips trailing slashes.
+- STORAGE_KEY = filmy.apiBase. normalize() strips trailing slashes.
 - getApiBase caches in a module-level var; reads localStorage lazily; try/catch for private mode.
 - apiUrl(path) returns path when base is empty, else base + path.
 - checkHealth(timeoutMs=8000) uses AbortController; returns a result object and NEVER throws.

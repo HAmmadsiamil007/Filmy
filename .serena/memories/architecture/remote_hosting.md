@@ -8,7 +8,7 @@ Rejected the bundle-Python-in-app alternative: adds size, process-lifecycle comp
 every user machine into a relay for copyrighted bytes (see mem:legal_risks).
 
 ## Implementation
-- web/src/config.ts: getApiBase, setApiBase, apiUrl, checkHealth, isTauri. localStorage key moviebox.apiBase.
+- web/src/config.ts: getApiBase, setApiBase, apiUrl, checkHealth, isTauri. localStorage key filmy.apiBase.
 - Empty base = SAME ORIGIN. That is what the Vite dev proxy and any reverse-proxied deploy use.
 - web/src/Settings.tsx: modal with Test (calls /health) and Save.
 - web/src/api.ts: getJSON and proxiedUrl both route through apiUrl. NEVER build URLs from window.location.origin directly; with a remote backend that points video at the wrong host.

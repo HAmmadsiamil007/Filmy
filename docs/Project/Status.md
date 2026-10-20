@@ -9,6 +9,34 @@ updated: 2026-10-20
 > [!success] Backend + Web are DONE
 > Everything below was verified against the live server, not just written.
 
+## Project renamed to **Filmy** (2026-10-20)
+
+The product name changed from *MovieBox* to ***Filmy*** across the whole
+codebase. Two things kept this safe:
+
+- **Upstream literals were never candidates.** The backend talks to hosts whose
+  names contain the old word (`apig.inmoviebox.com`, `moviebox.ph`,
+  `inmoviebox.com`, `movie-box.co`, `x-source: moviebox`, the SSRF allowlist).
+  Those were classified as protected *before* any replacement ran, then verified
+  byte-identical afterwards.
+- **"MovieBox" is still correct in upstream-facing prose** - `AGENTS.md`,
+  `Overview.md` and ADR-002/004 mean the catalog we scrape, not us.
+
+Changed: npm package `filmy-web` · Tauri `Filmy` / `com.filmy.desktop` · crate
+`filmy-desktop` / `filmy_desktop_lib` · Android `com.filmy.app` · Gradle root
+`Filmy` · settings key `filmy.apiBase` · `FilmyEngine` · `FilmyApp` /
+`FilmyTheme` / `Theme.Filmy`.
+
+> [!info] Existing settings survive
+> Renaming the storage keys would have wiped a user's configured backend, so
+> both clients migrate: `config.ts` falls back to the old `moviebox.apiBase`,
+> `Config.kt` adopts the old `moviebox` SharedPreferences file on `init()`.
+
+Verified: `pytest` 129 passed · `tsc -b` 0 · `vite build` 0 · link check
+53 files / 219 links / 0 broken · Android static checks (14/14 package-vs-path,
+all `com.filmy.*` imports resolve). **Android is still uncompiled** - no Gradle
+here, so that check is structural only.
+
 ## ✅ Repo hygiene — project files + CI (2026-10-20)
 
 The repo now carries the standard project files, **all of them linked rather than duplicated** — details in [[Reference/Project Files]].

@@ -36,7 +36,7 @@
 
 | # | Rule | Why |
 |---|------|-----|
-| C1 | **The API base URL is runtime-configurable** (`config.ts` / `Config.kt`, stored under `moviebox.apiBase`). Never hard-code a host, and never derive playback URLs from `window.location.origin`. | ADR-005 — all clients are thin and point at a user-supplied backend. Deriving from `location` silently points video at the wrong host once the backend is remote. |
+| C1 | **The API base URL is runtime-configurable** (`config.ts` / `Config.kt`, stored under `filmy.apiBase`). Never hard-code a host, and never derive playback URLs from `window.location.origin`. | ADR-005 — all clients are thin and point at a user-supplied backend. Deriving from `location` silently points video at the wrong host once the backend is remote. |
 | C2 | **Only two codebases exist:** `web/` (which Tauri wraps) and `android/` (which TV extends). | ADR-003. Do not create a third tree for the desktop or TV targets. |
 | C3 | **Web passes `include_adult=true`; do not remove it casually.** | ADR-004 makes the server default filtered; the web client is the explicit opt-in. |
 
