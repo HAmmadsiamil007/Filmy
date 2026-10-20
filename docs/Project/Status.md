@@ -9,6 +9,39 @@ updated: 2026-10-20
 > [!success] Backend + Web are DONE
 > Everything below was verified against the live server, not just written.
 
+## ✅ Repo hygiene — project files + CI (2026-10-20)
+
+The repo now carries the standard project files, **all of them linked rather than duplicated** — details in [[Reference/Project Files]].
+
+| Added | Purpose |
+| --- | --- |
+| `rules.md` | Invariants with the bug each one exists for |
+| `architecture.md` | One-page system map + both request paths |
+| `design.md` | Shared design tokens, incl. known web↔Android divergences |
+| `AGENTS.md` | AI-agent entry point (auto-read by tooling) |
+| `CONTRIBUTING.md` | **Rewritten** — had mojibake emoji and a dead `verify.py` reference |
+| `SECURITY.md` | Threat model + the SSRF boundary |
+| `CHANGELOG.md` | Keep a Changelog, 2.5.0 |
+| `.editorconfig` · `.env.example` | Formatting; documents that no env vars are read |
+| `.github/workflows/ci.yml` | pytest · tsc+vite · link check on every push/PR |
+| `scripts/check_wikilinks.py` | 53 files, 219 links, 0 broken |
+
+> [!warning] CI is written, not executed
+> GitHub Actions cannot run from here. Every command *inside* the workflow was
+> run locally and is green — the workflow YAML itself is unverified.
+
+### Two gitignore bugs caught before committing
+
+1. **Inline `#` comments aren't supported** — `*.tsbuildinfo   # note` made the whole tail part of the pattern, so it matched nothing.
+2. **Unanchored `moviebox/` matched `com/moviebox/app/`** — it was silently swallowing the entire Android source tree. A dry-run showed 27 files with **zero `.kt` files**; committing would have shipped `android/` with no code.
+
+Full detail + the rules: [[Guides/Git Workflow]].
+
+### Git state
+
+- **9 commits local** on `main`, **not pushed** (decision: 2026-10-20).
+- Serena memory graph: **20 memories** (root `mem:core`).
+
 ## ✅ Backend — complete (2026-10-20)
 
 Five blockers fixed in `api.py`:
@@ -99,4 +132,4 @@ Android TV variant — not started.
 
 ## 🗄️ Memory sync
 
-Serena memory graph is written (**18 memories**, root `mem:core`). This vault mirrors it for humans. After any backend/player change, update **both** — see [[Guides/Verification]] § Memory sync.
+Serena memory graph is written (**20 memories**, root `mem:core`). This vault mirrors it for humans. After any backend/player change, update **both** — see [[Guides/Verification]] § Memory sync.

@@ -62,6 +62,38 @@ npx tsc -b       # type-check only
 
 Covers `is_proxyable` (SSRF), `classify_subject_type`, `is_adult`/`strip_adult`, the TTL cache, `fetch_with_backoff`, and endpoint guards. What is *not* covered: the proxy `206`/`Content-Range` check — that needs the live upstream ([[Guides/Verification]]).
 
+## Documentation
+
+```powershell
+# validate every wikilink AND relative markdown link (repo-wide, 53 files)
+python scripts\check_wikilinks.py
+python scripts\check_wikilinks.py --verbose   # list every link found
+```
+
+Exit `0` means clean. Prose like `` `[[wikilinks]]` `` is ignored on purpose.
+Run this after adding or renaming any note.
+
+## CI
+
+`.github/workflows/ci.yml` — three jobs on every push/PR to `main`:
+
+| Job | Runs |
+| --- | --- |
+| `backend` | pip install → `python -c "import api"` → `pytest tests -q` |
+| `frontend` | `npm ci` → `npx tsc -b` → `npm run build` |
+| `docs` | `python scripts/check_wikilinks.py` |
+
+Python **3.14**, Node **24** (both match the verified local toolchain).
+
+```powershell
+gh run list                 # inspect runs (requires GitHub CLI)
+gh run watch                # stream the current run
+```
+
+No Tauri job (needs Rust/MSVC) and **no Android job yet** — the sources have
+never compiled, so it would be permanently red. Enable it after the first green
+`.\gradlew.bat assembleDebug`.
+
 ## Tauri desktop
 
 ```powershell

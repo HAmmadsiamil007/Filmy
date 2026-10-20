@@ -8,6 +8,21 @@ status: active
 > [!abstract] Rule
 > **Evidence before assertions, always.** Every "it works" claim below was earned by running the command, not by reading the code.
 
+## 0. The gate — run all three, all must exit 0
+
+```powershell
+.\.venv\Scripts\pytest.exe tests -q          # 129 tests, no network, ~1.5s
+
+cd web; npx tsc -b; npm run build; cd ..     # type-check + production build
+
+python scripts\check_wikilinks.py            # 53 files, 219 links, 0 broken
+```
+
+CI runs exactly these three on every push and PR
+(`.github/workflows/ci.yml`). **Local green means CI green.**
+
+If you could not run a check, say which one and why — do not round it up to "passing".
+
 ## 1. Backend change
 
 ```powershell
@@ -54,6 +69,35 @@ Both servers up, then fetch video bytes **through the Vite proxy chain** (`http:
 - [ ] No `loadedmetadata` re-fire stall when handlers update
 
 Logic under test: [[Architecture/Adaptive Quality]].
+
+## 6. Docs change — link integrity
+
+> [!tip] Now automated
+> `scripts/check_wikilinks.py` validates every `[[wikilink]]` **and** every
+> relative markdown link across the whole repo, ignoring prose mentions in
+> backticks. CI runs it.
+
+```powershell
+python scripts\check_wikilinks.py
+python scripts\check_wikilinks.py --verbose   # list every link found
+```
+
+- [ ] exits `0`
+- [ ] any new note is **reachable** from `Home.md` or another index note
+- [ ] both stores updated if behaviour changed (§ Memory sync below)
+
+Adding a root file (`rules`, `design`, `architecture`, `AGENTS`)? It is checked
+too — the script is repo-wide, not `docs/`-only.
+
+## 7. Android change — static checks only
+
+No Android SDK here, so Gradle cannot run. Do the checks that *can* run, and
+state the result as **uncompiled**:
+
+- [ ] every `.kt` package declaration matches its file path
+- [ ] import sweep: each used symbol (`.background(`, `mutableLongStateOf`, …) has an import in that file
+- [ ] third-party APIs looked up, not recalled
+- [ ] when a toolchain exists: `.\gradlew.bat assembleDebug` + `testDebugUnitTest`
 
 ## Memory sync
 
