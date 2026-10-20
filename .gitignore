@@ -5,3 +5,34 @@ __pycache__/
 .venv
 env/
 venv/
+
+# Obsidian: commit vault config, ignore per-user transient state
+docs/.obsidian/workspace.json
+docs/.obsidian/workspace-mobile.json
+docs/.obsidian/cache
+docs/.obsidian/plugins
+docs/.obsidian/themes
+docs/.obsidian/snippets
+
+# Node / frontend
+node_modules/
+web/dist/
+web/.vite/
+
+# Android / Gradle
+android/.gradle/
+android/build/
+android/app/build/
+android/.idea/
+android/captures/
+android/local.properties   # machine-specific sdk.dir= path — never commit
+*.apk
+*.aab
+*.keystore
+*.jks
+
+# Stray local Obsidian vault at repo root (contains only a default Welcome.md).
+# Ownership unconfirmed — ignored so a future `git add -A` cannot sweep it in.
+# Remove this block once it is confirmed junk and deleted.
+moviebox/
+
