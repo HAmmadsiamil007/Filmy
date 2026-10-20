@@ -18,6 +18,7 @@ docs/.obsidian/snippets
 node_modules/
 web/dist/
 web/.vite/
+*.tsbuildinfo   # tsc -b incremental cache — changes on every type-check
 
 # Android / Gradle
 android/.gradle/
