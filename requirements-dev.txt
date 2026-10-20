@@ -1,0 +1,5 @@
+# Development / test dependencies.
+# Runtime deps stay in requirements.txt — install these only when running tests:
+#     .venv\Scripts\pip.exe install -r requirements-dev.txt
+#     .venv\Scripts\pytest.exe
+pytest==9.1.1
