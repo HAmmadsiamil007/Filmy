@@ -18,7 +18,9 @@ docs/.obsidian/snippets
 node_modules/
 web/dist/
 web/.vite/
-*.tsbuildinfo   # tsc -b incremental cache — changes on every type-check
+
+# tsc -b incremental cache (changes on every type-check)
+*.tsbuildinfo
 
 # Android / Gradle
 android/.gradle/
@@ -26,7 +28,10 @@ android/build/
 android/app/build/
 android/.idea/
 android/captures/
-android/local.properties   # machine-specific sdk.dir= path — never commit
+
+# machine-specific sdk.dir= path — never commit
+android/local.properties
+
 *.apk
 *.aab
 *.keystore
