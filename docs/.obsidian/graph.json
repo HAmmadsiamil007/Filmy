@@ -1,0 +1,14 @@
+{
+  "colorGroups": [
+    { "query": "path:Project", "color": { "a": 1, "rgb": 5431378 } },
+    { "query": "path:Architecture", "color": { "a": 1, "rgb": 11621088 } },
+    { "query": "path:Decisions", "color": { "a": 1, "rgb": 16744576 } },
+    { "query": "path:Roadmap", "color": { "a": 1, "rgb": 4408131 } },
+    { "query": "path:Reference", "color": { "a": 1, "rgb": 10066329 } },
+    { "query": "path:Guides", "color": { "a": 1, "rgb": 6737151 } }
+  ],
+  "showTags": true,
+  "showAttachments": false,
+  "hideUnresolved": false,
+  "showOrphans": true
+}
