@@ -17,3 +17,13 @@
 
 ## Style
 - Comments explain non-obvious WHY (why httpx not curl_cffi, why dedupe by quality_value). Keep doing this.
+## Project root files (created 2026-10-20)
+- rules.md is authoritative for invariants; architecture.md/design.md are overviews that LINK into docs/ rather than duplicate it.
+- AGENTS.md is short on purpose: orientation + pointers only. Do not grow it.
+- A token/color change must touch BOTH web/src/styles.css and android/.../ui/theme/Color.kt in the same commit, or be recorded as a gap in design.md section 8.
+- Known divergence to reconcile: error red web #FF8A8A vs Android ErrorRed #EF4444.
+
+## Git
+- git add --dry-run before git add on any new directory (see mem:project/git_hygiene).
+- .gitignore has no inline comments; unanchored dir patterns match at any depth.
+- Conventional Commits with scope.

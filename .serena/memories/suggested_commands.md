@@ -36,3 +36,22 @@ Invoke-WebRequest "http://127.0.0.1:8000/search?q=Avatar" -UseBasicParsing
 - Measure-Command { Invoke-WebRequest ... } to time cache cold vs warm.
 - .NET HttpWebRequest throws on 4xx/5xx - wrap in try/catch and read $_.Exception.Response.StatusCode.
 - StreamReader.ReadToEnd() on a video stream errors - the payload is binary.
+
+## Tests + docs checks (run before claiming done)
+```powershell
+# 129 tests, no network, ~1.5s
+.\.venv\Scripts\pip.exe install -r requirements-dev.txt   # once
+.\.venv\Scripts\pytest.exe tests -q
+
+# documentation link integrity (wikilinks + relative links)
+python scripts\check_wikilinks.py
+python scripts\check_wikilinks.py --verbose    # list every link
+
+# the same three things CI runs (.github/workflows/ci.yml)
+pytest tests -q ; cd web ; npx tsc -b ; npm run build ; cd .. ; python scripts\check_wikilinks.py
+```
+
+## CI
+.github/workflows/ci.yml = 3 jobs: backend (import check + pytest),
+frontend (npm ci + tsc + vite build), docs (link check). Python 3.14, Node 24.
+No Tauri job (needs Rust) and NO Android job yet (never compiled - would go red).

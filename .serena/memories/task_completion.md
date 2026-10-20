@@ -34,6 +34,21 @@ Both must exit 0. tsc catches unused-constant regressions (it flagged GOOD_BUFFE
 ## Full-stack check
 Dev server and backend both up, then fetch video bytes through the Vite proxy chain (http://127.0.0.1:5173/proxy/stream?...) and expect 206.
 
+
+
+## Docs change - LINK CHECK (runs in CI too)
+```powershell
+python scripts\check_wikilinks.py     # must exit 0
+```
+Validates `[[wikilinks]]` AND relative markdown links across all .md.
+Prose mentions like `[[wikilinks]]` in backticks are ignored on purpose.
+If you add a root file (rules/design/architecture/AGENTS), check it too -
+it runs repo-wide, not just docs/.
+
+## Full pre-done gate (what CI runs)
+pytest tests -q  +  cd web && npx tsc -b && npm run build  +  check_wikilinks.py
+All three exit 0. See mem:project/root_files for the CI workflow location.
+
 ## Android change (no toolchain in this env - see mem:architecture/android_build)
 This env has NO Android SDK/Gradle/ANDROID_HOME. Android sources are hand-reviewed only.
 Before claiming an Android change works, be explicit that it is UNCOMPILED.

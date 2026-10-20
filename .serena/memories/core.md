@@ -30,3 +30,5 @@ MovieBox REST API + clients. Scrapes/proxies the MovieBox (moviebox.ph) catalog;
 - Legal/compliance exposure: `mem:legal_risks`
 - Android APK (written, UNCOMPILED) + bugs caught by review: `mem:architecture/android_build`
 - Backend unit suite: 129 tests, pytest: `mem:backend/tests`
+- Repo-level project files (rules/AGENTS/architecture/design/CI/link-checker): `mem:project/root_files`
+- gitignore traps + commit practice: `mem:project/git_hygiene`
