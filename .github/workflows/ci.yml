@@ -1,0 +1,96 @@
+name: CI
+
+# Every job here wraps a command verified locally on Windows, in the same
+# working directories. Nothing runs in CI that has not been run by hand first.
+#
+# Deliberately NOT included yet:
+#   * tauri build  -> needs Rust + MSVC, not installed anywhere in this project
+#   * assembleDebug -> the Android sources have never compiled; adding it would
+#                      make CI permanently red. Enable it after the first
+#                      successful local `gradlew assembleDebug`.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend (pytest)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          # Matches the verified local interpreter (Python 3.14.6).
+          python-version: "3.14"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
+
+      - name: Install runtime dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Install test dependencies
+        run: python -m pip install -r requirements-dev.txt
+
+      - name: Import check (catches module-level syntax/side-effect errors)
+        run: python -c "import api; print('IMPORT OK')"
+
+      - name: Run unit suite
+        run: pytest tests -q
+
+  frontend:
+    name: Frontend (tsc + vite build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # Matches the verified local runtime (Node v24.18.0).
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type-check
+        run: npx tsc -b
+
+      - name: Production build
+        run: npm run build
+
+  docs:
+    name: Docs (link integrity)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+
+      # stdlib only, but installing pytest keeps pip caching consistent and
+      # guarantees the interpreter matches the other jobs.
+      - run: python -m pip install -r requirements-dev.txt
+
+      - name: Check wikilinks and relative links
+        run: python scripts/check_wikilinks.py
