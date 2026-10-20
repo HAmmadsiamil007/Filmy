@@ -1,8 +1,8 @@
-package com.moviebox.app.data
+package com.filmy.app.data
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.moviebox.app.BuildConfig
+import com.filmy.app.BuildConfig
 
 /**
  * Runtime-configurable API endpoint — the Android mirror of web/src/config.ts.
@@ -21,8 +21,13 @@ import com.moviebox.app.BuildConfig
  */
 object Config {
 
-    private const val PREFS = "moviebox"
-    private const val KEY_API_BASE = "moviebox.apiBase" // same key as web
+    // Renamed with the project (was "moviebox"). The pre-rename SharedPreferences
+    // file is read as a fallback so an upgrading install keeps its configured
+    // backend instead of silently falling back to the build-time default.
+    private const val PREFS = "filmy"
+    private const val LEGACY_PREFS = "moviebox"
+    private const val KEY_API_BASE = "filmy.apiBase" // same key as web
+    private const val LEGACY_KEY_API_BASE = "moviebox.apiBase"
 
     @Volatile
     private var cached: String? = null
@@ -31,7 +36,27 @@ object Config {
 
     /** Call once from Application so the object has a Context. */
     fun init(context: Context) {
-        prefs = context.applicationContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        val app = context.applicationContext
+        prefs = app.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        adoptLegacy(app)
+    }
+
+    /**
+     * One-shot migration: if nothing is stored under the new name but the
+     * pre-rename file has a value, copy it across and clear the old file.
+     * No-op on fresh installs.
+     */
+    private fun adoptLegacy(app: Context) {
+        val target = prefs ?: return
+        if (target.contains(KEY_API_BASE)) return
+        val legacyValue = app
+            .getSharedPreferences(LEGACY_PREFS, Context.MODE_PRIVATE)
+            .getString(LEGACY_KEY_API_BASE, "")
+            .orEmpty()
+        if (legacyValue.isBlank()) return
+        target.edit().putString(KEY_API_BASE, legacyValue).apply()
+        app.getSharedPreferences(LEGACY_PREFS, Context.MODE_PRIVATE)
+            .edit().clear().apply()
     }
 
     /** Strip trailing slashes so path joining never yields "//". */

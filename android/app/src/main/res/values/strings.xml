@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MovieBox</string>
+    <string name="app_name">Filmy</string>
 
     <!-- Search -->
     <string name="search_hint">Search movies, series, anime…</string>
@@ -23,7 +23,7 @@
     <string name="settings_title">Backend</string>
     <string name="settings_api_base_hint">API base URL</string>
     <string name="settings_api_base_placeholder">http://127.0.0.1:8000</string>
-    <string name="settings_blurb">Point this client at your self-hosted MovieBox API. Leave blank to use the built-in default.</string>
+    <string name="settings_blurb">Point this client at your self-hosted Filmy API. Leave blank to use the built-in default.</string>
     <string name="settings_test">Test</string>
     <string name="settings_save">Save</string>
     <string name="settings_checking">Checking…</string>

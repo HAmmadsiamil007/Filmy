@@ -1,4 +1,4 @@
-package com.moviebox.app.data
+package com.filmy.app.data
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

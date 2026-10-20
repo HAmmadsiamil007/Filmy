@@ -1,4 +1,4 @@
-// Typed client for the Moviebox FastAPI backend.
+// Typed client for the Filmy FastAPI backend.
 //
 // Three decisions baked in here that all four clients depend on:
 //   1. Video always plays through /proxy/stream (the CDN is Referer-locked and

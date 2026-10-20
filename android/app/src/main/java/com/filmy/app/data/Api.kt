@@ -1,4 +1,4 @@
-package com.moviebox.app.data
+package com.filmy.app.data
 
 import kotlinx.serialization.json.Json
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull

@@ -1,4 +1,4 @@
-package com.moviebox.app.ui.screens
+package com.filmy.app.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -42,11 +42,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.moviebox.app.data.Api
-import com.moviebox.app.data.SearchResult
-import com.moviebox.app.ui.theme.Divider
-import com.moviebox.app.ui.theme.Panel
-import com.moviebox.app.ui.theme.TextDim
+import com.filmy.app.data.Api
+import com.filmy.app.data.SearchResult
+import com.filmy.app.ui.theme.Divider
+import com.filmy.app.ui.theme.Panel
+import com.filmy.app.ui.theme.TextDim
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

@@ -1,4 +1,4 @@
-package com.moviebox.app.ui.screens
+package com.filmy.app.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -39,11 +39,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.moviebox.app.data.Api
-import com.moviebox.app.data.Config
-import com.moviebox.app.ui.theme.Divider
-import com.moviebox.app.ui.theme.Panel
-import com.moviebox.app.ui.theme.TextDim
+import com.filmy.app.data.Api
+import com.filmy.app.data.Config
+import com.filmy.app.ui.theme.Divider
+import com.filmy.app.ui.theme.Panel
+import com.filmy.app.ui.theme.TextDim
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -123,7 +123,7 @@ fun SettingsScreen(onBack: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             Text(
-                "Point this client at your self-hosted MovieBox API. " +
+                "Point this client at your self-hosted Filmy API. " +
                     "Leave blank to fall back to the build-time default.",
                 color = TextDim,
                 style = MaterialTheme.typography.bodyMedium,

@@ -1,4 +1,4 @@
-// MovieBox Android — version catalog.
+// Filmy Android — version catalog.
 // Single source of truth for dependency versions. Keep pins here, not in
 // module build files, so the phone APK and Android TV variant can share them.
 [versions]

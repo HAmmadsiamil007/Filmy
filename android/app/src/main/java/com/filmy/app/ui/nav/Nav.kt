@@ -1,4 +1,4 @@
-package com.moviebox.app.ui.nav
+package com.filmy.app.ui.nav
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -7,10 +7,10 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.moviebox.app.ui.screens.DetailScreen
-import com.moviebox.app.ui.screens.HomeScreen
-import com.moviebox.app.ui.screens.PlayerScreen
-import com.moviebox.app.ui.screens.SettingsScreen
+import com.filmy.app.ui.screens.DetailScreen
+import com.filmy.app.ui.screens.HomeScreen
+import com.filmy.app.ui.screens.PlayerScreen
+import com.filmy.app.ui.screens.SettingsScreen
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets

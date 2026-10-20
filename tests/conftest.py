@@ -1,4 +1,4 @@
-"""Shared fixtures for MovieBox backend tests.
+"""Shared fixtures for Filmy backend tests.
 
 Adds the repo root to sys.path so `import api` works no matter where pytest is
 invoked from (repo root, tests/, or an IDE runner).

@@ -34,8 +34,8 @@ if sys.stderr and hasattr(sys.stderr, "reconfigure"):
         pass
 
 app = FastAPI(
-    title="MovieBox 1080p API",
-    description="REST API for MovieBox with 1080p Stream & Subtitle Extraction",
+    title="Filmy 1080p API",
+    description="REST API for Filmy with 1080p Stream & Subtitle Extraction",
     version="2.5.0"
 )
 
@@ -312,7 +312,7 @@ def extract_policy_resource(sign_cookie: str | None) -> str | None:
                 pass
     return None
 
-class MovieBoxEngine:
+class FilmyEngine:
     _instance = None
 
     def __init__(self):
@@ -324,9 +324,9 @@ class MovieBoxEngine:
             self.session = httpx.Client(timeout=25, follow_redirects=True)
 
     @classmethod
-    def get_instance(cls) -> "MovieBoxEngine":
+    def get_instance(cls) -> "FilmyEngine":
         if cls._instance is None:
-            cls._instance = MovieBoxEngine()
+            cls._instance = FilmyEngine()
         return cls._instance
 
     def bootstrap_token(self, force: bool = False) -> str:
@@ -336,7 +336,7 @@ class MovieBoxEngine:
         resp = self.session.get(BOOTSTRAP_URL, headers=headers, timeout=20)
         x_user = resp.headers.get("x-user")
         if not x_user:
-            raise HTTPException(status_code=502, detail="Failed to bootstrap MovieBox token")
+            raise HTTPException(status_code=502, detail="Failed to bootstrap upstream token")
         token_data = json.loads(x_user)
         token = token_data.get("token")
         if not token:
@@ -628,7 +628,7 @@ class MovieBoxEngine:
 
         return subs
 
-engine = MovieBoxEngine.get_instance()
+engine = FilmyEngine.get_instance()
 
 @app.get("/", response_class=HTMLResponse)
 async def dashboard():
@@ -637,7 +637,7 @@ async def dashboard():
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MovieBox API</title>
+    <title>Filmy API</title>
     <style>
         :root {
             --bg: #09090b;
@@ -883,7 +883,7 @@ async def dashboard():
     <div class="wrap">
         <header>
             <div class="brand">
-                <h1>MovieBox API</h1>
+                <h1>Filmy API</h1>
                 <span class="pill">v2.5.0</span>
                 <span class="pill active">1080p Online</span>
             </div>

@@ -2,14 +2,14 @@
 # Serializers are looked up reflectively by generated Companion methods.
 -keepattributes *Annotation*, InnerClasses
 -dontnote kotlinx.serialization.**
--keepclassmembers class com.moviebox.app.data.** {
+-keepclassmembers class com.filmy.app.data.** {
     *** Companion;
 }
--keepclasseswithmembers class com.moviebox.app.data.** {
+-keepclasseswithmembers class com.filmy.app.data.** {
     kotlinx.serialization.KSerializer serializer(...);
 }
 # Keep the generated serializer() companions from being stripped.
--keep,includedescriptorclasses class com.moviebox.app.data.**$$serializer { *; }
+-keep,includedescriptorclasses class com.filmy.app.data.**$$serializer { *; }
 
 # ---- OkHttp ----------------------------------------------------------------
 -dontwarn okhttp3.**
@@ -26,7 +26,7 @@
 # ---- General ---------------------------------------------------------------
 # Playable model classes are only accessed via serialization; keep field names
 # so JSON mapping cannot break under R8 name mangling.
--keepclassmembers class com.moviebox.app.data.** {
+-keepclassmembers class com.filmy.app.data.** {
     <fields>;
     <init>(...);
 }

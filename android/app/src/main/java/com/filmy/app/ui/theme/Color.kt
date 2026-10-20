@@ -1,4 +1,4 @@
-package com.moviebox.app.ui.theme
+package com.filmy.app.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

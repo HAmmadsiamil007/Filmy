@@ -1,4 +1,4 @@
-package com.moviebox.app.ui.screens
+package com.filmy.app.ui.screens
 
 import android.app.Activity
 import android.content.pm.ActivityInfo
@@ -49,13 +49,13 @@ import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
-import com.moviebox.app.data.Api
-import com.moviebox.app.data.Config
-import com.moviebox.app.data.Stream
-import com.moviebox.app.player.QualityLogic
-import com.moviebox.app.ui.theme.Panel
-import com.moviebox.app.ui.theme.Panel2
-import com.moviebox.app.ui.theme.TextDim
+import com.filmy.app.data.Api
+import com.filmy.app.data.Config
+import com.filmy.app.data.Stream
+import com.filmy.app.player.QualityLogic
+import com.filmy.app.ui.theme.Panel
+import com.filmy.app.ui.theme.Panel2
+import com.filmy.app.ui.theme.TextDim
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext

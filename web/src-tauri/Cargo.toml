@@ -1,13 +1,13 @@
 [package]
-name = "moviebox-desktop"
+name = "filmy-desktop"
 version = "0.1.0"
-description = "MovieBox desktop client (thin shell over the React web app)"
+description = "Filmy desktop client (thin shell over the React web app)"
 authors = ["you"]
 edition = "2021"
 rust-version = "1.77.2"
 
 [lib]
-name = "moviebox_desktop_lib"
+name = "filmy_desktop_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]

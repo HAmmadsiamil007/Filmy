@@ -66,7 +66,7 @@ export default function Settings({ open, onClose, onApplied }: Props) {
       >
         <h2>Backend</h2>
         <p className="modal-hint">
-          Point this client at your self-hosted MovieBox API. Leave blank to use the same origin
+          Point this client at your self-hosted Filmy API. Leave blank to use the same origin
           (dev proxy or reverse-proxied deploy).
           {isTauri() && " Running in the desktop app."}
         </p>

@@ -1,4 +1,4 @@
-package com.moviebox.app.ui.theme
+package com.filmy.app.ui.theme
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
@@ -38,7 +38,7 @@ private val AppTypography = Typography(
 )
 
 @Composable
-fun MovieBoxTheme(content: @Composable () -> Unit) {
+fun FilmyTheme(content: @Composable () -> Unit) {
     MaterialTheme(
         colorScheme = DarkColors,
         typography = AppTypography,

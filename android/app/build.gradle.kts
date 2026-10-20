@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.moviebox.app"
+    namespace = "com.filmy.app"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.moviebox.app"
+        applicationId = "com.filmy.app"
         minSdk = 24          # ExoPlayer/Media3 floor; covers ~97% of devices
         targetSdk = 35
         versionCode = 1

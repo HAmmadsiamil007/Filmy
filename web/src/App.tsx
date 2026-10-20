@@ -81,7 +81,7 @@ export default function App() {
   );
 
   useEffect(() => {
-    document.title = view.kind === "detail" ? `${view.title} · MovieBox` : "MovieBox";
+    document.title = view.kind === "detail" ? `${view.title} · Filmy` : "Filmy";
   }, [view]);
 
   const back = () => {
@@ -95,7 +95,7 @@ export default function App() {
     <div className="app">
       <header className="topbar">
         <button className="brand" onClick={back}>
-          MovieBox
+          Filmy
         </button>
         <form
           className="search"

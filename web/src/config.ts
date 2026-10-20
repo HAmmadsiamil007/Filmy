@@ -8,7 +8,12 @@
 // Persisted to localStorage so desktop (Tauri) and web remember it. Android
 // mirrors this shape with SharedPreferences.
 
-const STORAGE_KEY = "moviebox.apiBase";
+const STORAGE_KEY = "filmy.apiBase";
+
+// Pre-rename key (the project used to be called MovieBox). Read as a fallback
+// so an install that already configured a backend survives the upgrade instead
+// of silently reverting to same-origin. Safe to delete once no old builds ship.
+const LEGACY_STORAGE_KEY = "moviebox.apiBase";
 
 /** Strip trailing slashes so path joining never produces double slashes. */
 function normalize(raw: string): string {
@@ -24,7 +29,16 @@ let cached: string | null = null;
 export function getApiBase(): string {
   if (cached !== null) return cached;
   try {
-    cached = normalize(window.localStorage.getItem(STORAGE_KEY) ?? "");
+    const current = normalize(window.localStorage.getItem(STORAGE_KEY) ?? "");
+    if (current) {
+      cached = current;
+    } else {
+      // Adopt the pre-rename value so upgrades keep the user's configured URL.
+      const legacy = normalize(window.localStorage.getItem(LEGACY_STORAGE_KEY) ?? "");
+      cached = legacy;
+      if (legacy) window.localStorage.setItem(STORAGE_KEY, legacy);
+      window.localStorage.removeItem(LEGACY_STORAGE_KEY);
+    }
   } catch {
     // Private mode / blocked storage — fall back to same origin.
     cached = "";

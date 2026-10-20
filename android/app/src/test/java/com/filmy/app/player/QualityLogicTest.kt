@@ -1,6 +1,6 @@
-package com.moviebox.app.player
+package com.filmy.app.player
 
-import com.moviebox.app.data.Stream
+import com.filmy.app.data.Stream
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

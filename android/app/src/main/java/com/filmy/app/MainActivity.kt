@@ -1,4 +1,4 @@
-package com.moviebox.app
+package com.filmy.app
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -11,9 +11,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.moviebox.app.ui.nav.AppNav
-import com.moviebox.app.ui.theme.Bg
-import com.moviebox.app.ui.theme.MovieBoxTheme
+import com.filmy.app.ui.nav.AppNav
+import com.filmy.app.ui.theme.Bg
+import com.filmy.app.ui.theme.FilmyTheme
 
 /**
  * Single-activity host. All screens are Compose; navigation is handled by
@@ -29,7 +29,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContent {
-            MovieBoxTheme {
+            FilmyTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = Bg,
