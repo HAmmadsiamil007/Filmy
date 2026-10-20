@@ -40,5 +40,9 @@ android/local.properties
 # Stray local Obsidian vault at repo root (contains only a default Welcome.md).
 # Ownership unconfirmed — ignored so a future `git add -A` cannot sweep it in.
 # Remove this block once it is confirmed junk and deleted.
-moviebox/
+#
+# The leading slash is essential: an unanchored `moviebox/` matches ANY dir
+# named moviebox at any depth, which silently excluded the whole Android
+# source tree at android/app/src/main/java/com/moviebox/app/.
+/moviebox/
 

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Brand palette, matched to web/src/styles.css so the phone APK, the web app
+  and the Tauri desktop shell read as the same product.
+
+  --bg        #0b0d12   -> color/bg
+  --panel     #141821   -> color/panel
+  --panel-2   #1b2130   -> color/panel_2
+  --text      #e7ecf3   -> color/text
+  --text-dim  #8b94a7   -> color/text_dim
+  --accent    #e50914   -> color/accent
+  --accent-2  #3b82f6   -> color/accent_2
+-->
+<resources>
+    <color name="bg">#0B0D12</color>
+    <color name="panel">#141821</color>
+    <color name="panel_2">#1B2130</color>
+    <color name="text">#E7ECF3</color>
+    <color name="text_dim">#8B94A7</color>
+    <color name="accent">#E50914</color>
+    <color name="accent_2">#3B82F6</color>
+
+    <!-- Splash / window background so first frame is never white. -->
+    <color name="window_background">#0B0D12</color>
+
+    <!-- Adaptive icon layers (see mipmap-anydpi-v26/ic_launcher.xml). -->
+    <color name="ic_launcher_background">#0B0D12</color>
+</resources>

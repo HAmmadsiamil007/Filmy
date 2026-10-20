@@ -1,0 +1,37 @@
+<resources>
+    <string name="app_name">MovieBox</string>
+
+    <!-- Search -->
+    <string name="search_hint">Search movies, series, anime…</string>
+    <string name="search_action">Search</string>
+    <string name="search_empty">Search for something to get started.</string>
+
+    <!-- Detail -->
+    <string name="episodes">Episodes</string>
+    <string name="season_format">Season %1$d</string>
+    <string name="play">Play</string>
+    <string name="play_episode_format">Play S%1$02dE%2$02d</string>
+
+    <!-- Player -->
+    <string name="player_quality_auto">Auto</string>
+    <string name="player_quality_format">%1$s · %2$s</string>
+    <string name="player_error">Playback failed</string>
+    <string name="player_no_streams">No playable stream found.</string>
+    <string name="player_retry">Retry</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Backend</string>
+    <string name="settings_api_base_hint">API base URL</string>
+    <string name="settings_api_base_placeholder">http://127.0.0.1:8000</string>
+    <string name="settings_blurb">Point this client at your self-hosted MovieBox API. Leave blank to use the built-in default.</string>
+    <string name="settings_test">Test</string>
+    <string name="settings_save">Save</string>
+    <string name="settings_checking">Checking…</string>
+    <string name="settings_connected">Connected</string>
+    <string name="settings_saved">Saved</string>
+
+    <!-- Errors -->
+    <string name="error_generic">Something went wrong.</string>
+    <string name="error_network">Couldn\'t reach the backend. Check the API URL in Settings.</string>
+    <string name="retry">Retry</string>
+</resources>

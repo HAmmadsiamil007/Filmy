@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Adaptive-icon foreground (API 26+).
+  Viewport is 108x108 because adaptive icons reserve the outer 18dp on each
+  side for the system mask and parallax — the visible/safe area is the inner
+  72x72 centered region. The triangle below sits inside that safe zone, so it
+  can never be clipped by a circular or squircle launcher mask.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Play triangle, optically centred (shifted right ~3dp for balance).
+         Bounding box roughly x:34..74, y:36..72 — within the 18..90 safe box. -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M40,36 L40,72 L74,54 Z" />
+</vector>

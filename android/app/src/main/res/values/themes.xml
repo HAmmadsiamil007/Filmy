@@ -1,0 +1,18 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!--
+      Base theme. Material3 supplies the component styling; this only pins the
+      window/status-bar chrome to the dark brand palette so there is no white
+      flash before Compose takes over.
+
+      Theme.* parent intentionally avoids AppCompat/Material Components — the
+      app is Compose-only, so pulling in those libraries would be dead weight.
+    -->
+    <style name="Theme.MovieBox" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/window_background</item>
+        <item name="android:statusBarColor">@color/bg</item>
+        <item name="android:navigationBarColor">@color/bg</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="23">false</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="27">false</item>
+        <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="27">shortEdges</item>
+    </style>
+</resources>

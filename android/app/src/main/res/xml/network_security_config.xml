@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Cleartext policy.
+
+  WHY: the backend-hosting decision is remote/self-hosted (ADR-005), and a
+  self-hosted API is routinely plain http:// on a LAN (127.0.0.1:8000,
+  192.168.1.20:8000). Android blocks cleartext from API 28+, which would break
+  the Settings "Test" probe and every API call for those setups.
+
+  DESIGN TENSION (documented, not hidden):
+  Android's <network-security-config> <domain> element accepts literal host
+  names or IPs only — it does NOT accept CIDR ranges, so you cannot whitelist
+  "the whole private LAN" statically. Because the API base is a *runtime,
+  user-entered* value (ADR-005), any static allowlist is either too narrow
+  (breaks real setups) or too broad.
+
+  DECISION: permit cleartext globally here. This is acceptable for this client
+  because:
+    - The backend has NO auth and stores no user data/credentials, so there is
+      nothing secret for a MITM to steal.
+    - The risk is limited to an attacker on the same LAN swapping a stream
+      URL, which is already an accepted exposure for a self-hosted media proxy.
+    - Production CDN URLs are https regardless; this config only governs the
+      API host the user chose.
+
+  HARDENING OPTIONS if this ever ships publicly (pick one, don't ship both):
+    a) Require https in the backend and set cleartextTrafficPermitted=false.
+    b) Ship a curated <domain-config> list of known self-hosted hostnames.
+  See docs/Risks and Compliance.md § Security.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>
